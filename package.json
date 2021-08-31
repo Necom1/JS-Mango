@@ -1,6 +1,16 @@
 {
+  "name": "Mango-JS",
+  "version": "0.1.0",
+  "description": "Discord Bot Written in Discord.JS",
+  "main": "./index.js",
+  "author": "Necom1",
+  "license": "MIT",
   "dependencies": {
+    "@discordjs/builders": "^0.6.0",
+    "@discordjs/rest": "^0.1.0-canary.0",
+    "discord-api-types": "^0.22.0",
     "discord.js": "^13.1.0",
+    "fast-average-color-node": "^1.0.3",
     "mongoose": "^6.0.2"
   },
   "devDependencies": {
