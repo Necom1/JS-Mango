@@ -14,7 +14,7 @@ function RunFunction(msg, args, bot) {}
 class Command {
     /**
      * @typedef {{name: string, description: string, run: RunFunction, minArgs: Number, maxArgs: Number,
-     * permission: Discord.PermissionString}} CommandOptions
+     * permission: Discord.PermissionString, aliases: Array<String>}} CommandOptions
      * @param {CommandOptions} options
      * @constructor
      */
@@ -22,6 +22,7 @@ class Command {
         this.name = options.name;
         this.description = options.description;
         this.permission = options.permission;
+        this.aliases = options.aliases;
         this.minArgs = options.minArgs;
         this.maxArgs = options.maxArgs;
         this.run = options.run;

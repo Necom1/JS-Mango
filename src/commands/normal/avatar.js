@@ -5,6 +5,7 @@ const getAvgC = require('fast-average-color-node');
 module.exports = new Command({
     name: 'avatar',
     description: 'returns avatar of the specified user in embed',
+    aliases: ['pfp'],
     permission: 'SEND_MESSAGES',
     minArgs: 0,
     maxArgs: 1,

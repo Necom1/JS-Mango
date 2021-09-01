@@ -4,6 +4,7 @@ const Command = require('../../structures/command.js');
 module.exports = new Command({
     name: 'ping',
     description: 'Measures Ping between the bot and Discord',
+    aliases: ['connection'],
     permission: 'SEND_MESSAGES',
 
     async run(msg, args, bot) {

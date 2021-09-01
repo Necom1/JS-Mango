@@ -5,6 +5,7 @@ const getAvgC = require('fast-average-color-node');
 module.exports = new Command({
     name: 'userinfo',
     description: 'returns Discord data associated with the target',
+    aliases: ['uinfo'],
     permission: 'SEND_MESSAGES',
     minArgs: 0,
     maxArgs: 1,
@@ -34,9 +35,9 @@ module.exports = new Command({
             }
 
             embed.addFields([{
-                name: 'Joined Discord on', value: data.user.createdAt.toISOString()
+                name: 'Joined Discord on', value: data.user.createdAt.toUTCString()
             }, {
-                name: 'Joined Server on', value: data.joinedAt.toISOString()
+                name: 'Joined Server on', value: data.joinedAt.toUTCString()
             }]);
 
             let temp = `**__Roles (${data.roles.cache.size})__**\n`;

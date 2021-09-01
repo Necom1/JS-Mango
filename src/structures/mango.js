@@ -35,49 +35,69 @@ class Mango extends Discord.Client {
          * @type {Collection<string, Command>}
          */
         this.commands = new Discord.Collection();
+        this.commandAliases = new Discord.Collection();
         console.log('*********************************************************');
-        this.loadCommands('./src/commands');
+        this.loader('./src/commands', 'commands');
 
         console.log('*********************************************************');
-        this.loadEvents('./src/events');
+        this.loader('./src/events', 'events');
 
         this.login(config.token);
     }
 
-    loadCommands(dir) {
-        fs.readdirSync(dir).forEach(file => {
-            const dirPath = `${dir}/${file}`;
-            if (fs.statSync(dirPath).isDirectory()) {
-                this.loadCommands(dirPath);
-            } else {
-                if (!file.startsWith('!') && file.endsWith('.js')) {
-                    /**
-                     * @type{Command}
-                     */
-                    const command = require(`.${dirPath.replace('/src', '')}`);
-                    console.log(`Loaded Command: ${command.name}`);
-                    this.commands.set(command.name, command);
-                }
+    loadCommand(dirPath) {
+        /**
+         * @type{Command}
+         */
+        const command = require(`.${dirPath.replace('/src', '')}`);
+        if (Array(this.commands.keys()).includes(command.name)) {
+            throw new Error(`${command.name}: Failed to load as command of similar name already exist`);
+        }
+        this.commands.set(command.name, command);
+        command.aliases.forEach(i => {
+            if(Array(this.commandAliases.keys()).includes(i)) {
+                throw new Error(`${command.name}: Failed to load due to the alias ${i} 
+                is already assigned to ${this.commandAliases[i]} command`);
             }
+            this.commandAliases.set(i, command.name);
         });
+        console.log(`Loaded Command: ${command.name} | ${dirPath}`);
     }
 
-    loadEvents(dir) {
-        fs.readdirSync(dir).forEach(file => {
-            const dirPath = `${dir}/${file}`;
-            if (fs.statSync(dirPath).isDirectory()) {
-                this.loadEvents(dirPath);
-            } else {
-                if (!file.startsWith('!') && file.endsWith('.js')) {
-                    /**
-                     * @type{Event}
-                     */
-                    const event = require(`.${dirPath.replace('/src', '')}`);
-                    console.log(`Loaded Event: ${event.event} | ${dirPath}`);
-                    this.on(event.event, event.run.bind(null, this));
+    loadEvent(dirPath) {
+        /**
+         * @type{Event}
+         */
+        const event = require(`.${dirPath.replace('/src', '')}`);
+        console.log(`Loaded Event: ${event.event} | ${dirPath}`);
+        this.on(event.event, event.run.bind(null, this));
+    }
+
+    loader(dir, type) {
+        const directories = [dir];
+
+        type = type.toLowerCase();
+
+        while(directories.length > 0) {
+            const temp = directories.shift();
+            fs.readdirSync(temp).forEach(file => {
+                const dirPath = `${temp}/${file}`;
+                if (fs.statSync(dirPath).isDirectory()) {
+                    directories.push(dirPath);
+                } else {
+                    if (!file.startsWith('!') && file.endsWith('.js')) {
+                        if (['commands', 'command'].includes(type)) {
+                            this.loadCommand(dirPath);
+                        } else if (['event', 'events'].includes(type)) {
+                            this.loadEvent(dirPath);
+                        } else {
+                            throw new Error(`${type} is not supported`);
+                        }
+                    }
                 }
-            }
-        });
+            });
+        }
+
     }
 
     /**

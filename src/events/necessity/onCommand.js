@@ -1,11 +1,15 @@
 const Event = require('../../structures/event');
 
 module.exports = new Event('messageCreate', async (bot, msg) => {
-    if(!msg.content.startsWith(bot.defaultPrefix)) return;
+    const mention = `<@!${bot.user.id}>`;
+    if(!msg.content.startsWith(bot.defaultPrefix) && !msg.content.startsWith(mention)) return;
 
-    const args = msg.content.substring(bot.defaultPrefix.length).split(/ /);
-    const temp = args.shift()
-    const command = bot.commands.find(cmd => cmd.name === temp);
+    const args = msg.content.substring(
+        !msg.content.startsWith(mention) ? bot.defaultPrefix.length : mention.length + 1
+    ).split(/ /);
+
+    const temp = args.shift().toLowerCase();
+    const command = bot.commands.get(temp) || bot.commands.get(bot.commandAliases.get(temp));
 
     if (!command || msg.author.bot) return;
 
