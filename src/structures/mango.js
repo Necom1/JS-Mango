@@ -26,7 +26,7 @@ class Mango extends Discord.Client {
             // Intents.FLAGS.DIRECT_MESSAGE_TYPING,
         ]
 
-        const config = require('../data/config.json');
+        const config = require('../../data/config.json');
 
         super({ intents });
         this.defaultPrefix = config.prefix;
@@ -36,10 +36,10 @@ class Mango extends Discord.Client {
          */
         this.commands = new Discord.Collection();
         console.log('*********************************************************');
-        this.loadCommands('./commands');
+        this.loadCommands('./src/commands');
 
         console.log('*********************************************************');
-        this.loadEvents('./events');
+        this.loadEvents('./src/events');
 
         this.login(config.token);
     }
@@ -54,7 +54,7 @@ class Mango extends Discord.Client {
                     /**
                      * @type{Command}
                      */
-                    const command = require(`.${dirPath}`);
+                    const command = require(`.${dirPath.replace('/src', '')}`);
                     console.log(`Loaded Command: ${command.name}`);
                     this.commands.set(command.name, command);
                 }
@@ -72,7 +72,7 @@ class Mango extends Discord.Client {
                     /**
                      * @type{Event}
                      */
-                    const event = require(`.${dirPath}`);
+                    const event = require(`.${dirPath.replace('/src', '')}`);
                     console.log(`Loaded Event: ${event.event} | ${dirPath}`);
                     this.on(event.event, event.run.bind(null, this));
                 }

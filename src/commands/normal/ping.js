@@ -14,7 +14,7 @@ module.exports = new Command({
             .setTitle('Bot Current Latency')
             .setTimestamp(m.createdTimestamp)
             .setFooter(bot.user.username, bot.user.avatarURL({ dynamic: true }))
-            .addField('Discord Ping', `${ping}`, true)
+            .addField('Discord Ping', `${ping} ms`, true)
             .addField('Message Ping', `${m.createdTimestamp - msg.createdTimestamp} ms`, true);
 
         switch (true) {
