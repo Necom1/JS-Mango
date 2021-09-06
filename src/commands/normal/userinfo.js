@@ -1,26 +1,44 @@
-const Discord = require('discord.js');
+const { MessageEmbed, GuildMember, Message } = require('discord.js');
 const Command = require('../../structures/command.js');
 const getAvgC = require('fast-average-color-node');
 
 module.exports = new Command({
     name: 'userinfo',
     description: 'returns Discord data associated with the target',
+    options: [
+        {
+            name: 'target',
+            description: 'select a user',
+            type: 'USER',
+            required: false
+        }
+    ],
     aliases: ['uinfo'],
     permission: 'SEND_MESSAGES',
-    minArgs: 0,
     maxArgs: 1,
 
-    async run(msg, args, bot) {
-        const data = bot.getMember(msg.guild, args.length > 0 ? args[0] : msg.author.id);
+    async run(bot, ctx, args) {
+        const isMsg = ctx instanceof Message;
+        let data = null;
 
-        if(!data) return msg.reply('Can not find the specified user');
+        if(isMsg) {
+            data = bot.getMember(ctx.guild, args.length > 0 ? args[0] : ctx.author.id);
+        } else {
+            data = ctx.options.getUser('target');
+            data = bot.getMember(ctx.guild, data ? data.id : ctx.user.id);
+        }
 
-        const embed = new Discord.MessageEmbed();
-        if(data instanceof Discord.GuildMember) {
-            embed.setTimestamp(msg.createdTimestamp)
+        if(!data) return isMsg ? ctx.reply({content: 'Can not find the specified user'}) :
+            await ctx.followUp({content: 'Can not find the specified user'});
+
+        const embed = new MessageEmbed();
+        const author = isMsg ? ctx.author : ctx.user;
+
+        if(data instanceof GuildMember) {
+            embed.setTimestamp(ctx.createdTimestamp)
                 .setThumbnail(data.user.displayAvatarURL({dynamic: true, size: 512, format: 'png'}))
-                .setFooter(`Requested by ${msg.author.username}`,
-                    msg.author.displayAvatarURL({dynamic: true, format: 'png', size: 64}))
+                .setFooter(`Requested by ${author.username}`,
+                    author.displayAvatarURL({dynamic: true, format: 'png', size: 64}))
                 .setColor(data.displayHexColor);
             embed.addFields([{
                 name: 'Mention', value: `<@${data.id}>`, inline: true
@@ -48,6 +66,8 @@ module.exports = new Command({
             embed.setDescription(temp);
         }
 
-        msg.reply({embeds: [embed]});
+        // TODO: incorporate fetch user for bot admins
+
+        isMsg ? ctx.reply({embeds: [embed]}) : await ctx.followUp({embeds: [embed], content: null});
     }
 });

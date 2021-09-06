@@ -8,7 +8,10 @@ class Mango extends Discord.Client {
         console.log('=========================================================');
         console.log(`Now Starting Bot\t|\tOS: ${process.platform}`);
 
-        const intents = [
+        /**
+         * @type {Discord.BitFieldResolvable<Discord.IntentsString, number>}
+         */
+        const botIntents = [
             Intents.FLAGS.GUILDS,
             Intents.FLAGS.GUILD_MEMBERS,
             Intents.FLAGS.GUILD_BANS,
@@ -26,10 +29,16 @@ class Mango extends Discord.Client {
             // Intents.FLAGS.DIRECT_MESSAGE_TYPING,
         ]
 
+        /**
+         * @type {Discord.PartialTypes[]}
+         */
+        const botPartials = ['USER', 'CHANNEL', 'GUILD_MEMBER', 'MESSAGE', 'REACTION']
+
         const config = require('../../data/config.json');
 
-        super({ intents });
+        super({ intents: botIntents, partials: botPartials });
         this.defaultPrefix = config.prefix;
+        this.slashUpdate = options.slashUpdate;
 
         /**
          * @type {Collection<string, Command>}
@@ -98,6 +107,15 @@ class Mango extends Discord.Client {
             });
         }
 
+    }
+
+    slashCommandsData() {
+        const ret = [];
+        for (const i of this.commands.values()) {
+            const temp = i.slashData;
+            if (temp) ret.push(temp);
+        }
+        return ret;
     }
 
     /**

@@ -5,35 +5,55 @@ const getAvgC = require('fast-average-color-node');
 module.exports = new Command({
     name: 'avatar',
     description: 'returns avatar of the specified user in embed',
+    options: [
+        {
+            name: 'target',
+            description: 'select a user',
+            type: 'USER',
+            required: false
+        }
+    ],
     aliases: ['pfp'],
     permission: 'SEND_MESSAGES',
-    minArgs: 0,
     maxArgs: 1,
+    private: true,
 
-    async run(msg, args, bot) {
-        let target = args.length === 1 ? String(args[0]) : String(msg.author.id);
+    async run(bot, ctx, args) {
+        let target = '';
+        const isMsg = ctx instanceof Discord.Message;
 
-        if (msg.mentions.users.size < 1) {
-            target = bot.getMember(msg.guild, target);
+        if (isMsg) {
+            target = String(args.length === 1 ? args[0] : ctx.author.id);
+            if (!isNaN(target)) {
+                target = bot.getMember(ctx.guild, target);
 
-            if (!target) {
-                return msg.reply("Can not find the specified user");
+                if (!target) {
+                    if (isMsg) return ctx.reply('Can not find the specified user');
+                    return await ctx.followUp({ content: 'Can not find the specified user' });
+                }
+
+                target = target.user;
+            } else {
+                target = ctx.mentions.users.first();
             }
-
-            target = target.user;
         } else {
-            target = msg.mentions.users.first();
+            target = ctx.options.getUser('target');
+            if (!target) target = ctx.user.id;
         }
 
         const url = target.displayAvatarURL({ dynamic: true, size: 2048, format: 'png' });
         const c = (await getAvgC.getAverageColor(url)).hex;
         const embed = new Discord.MessageEmbed()
-            .setTimestamp(msg.createdTimestamp)
+            .setTimestamp(ctx.createdTimestamp)
             .setColor(c)
             .setAuthor(`${target.username}'s Profile Picture`, null, url)
             .setImage(url)
             .setFooter(target.id);
 
-        msg.reply({ embeds: [embed] });
+        if (isMsg) {
+            ctx.reply({ embeds: [embed] });
+        } else {
+            await ctx.followUp({ embeds: [embed], content: null });
+        }
     }
 });

@@ -1,22 +1,26 @@
-const Discord = require('discord.js');
+const { MessageEmbed, Message } = require('discord.js');
 const Command = require('../../structures/command.js');
 
 module.exports = new Command({
     name: 'ping',
     description: 'Measures Ping between the bot and Discord',
+    private: true,
     aliases: ['connection'],
     permission: 'SEND_MESSAGES',
 
-    async run(msg, args, bot) {
+    async run(bot, ctx, args) {
         const ping = bot.ws.ping;
-        const m = await msg.reply(`Ping: ${ping} ms`);
+        const isMsg = ctx instanceof Message;
 
-        const embed = new Discord.MessageEmbed()
+        const m = (isMsg) ? await ctx.reply(`Ping: ${ping} ms`) :
+            await ctx.followUp({content: `Ping: ${ping} ms`});
+
+        const embed = new MessageEmbed()
             .setTitle('Bot Current Latency')
             .setTimestamp(m.createdTimestamp)
             .setFooter(bot.user.username, bot.user.avatarURL({ dynamic: true }))
             .addField('Discord Ping', `${ping} ms`, true)
-            .addField('Message Ping', `${m.createdTimestamp - msg.createdTimestamp} ms`, true);
+            .addField('Message Ping', `${m.createdTimestamp - ctx.createdTimestamp} ms`, true);
 
         switch (true) {
             case (ping <= 200):
@@ -30,6 +34,10 @@ module.exports = new Command({
                 break;
         }
 
-        m.edit({ embeds: [embed], content: null });
+        if (isMsg) {
+            m.edit({ embeds: [embed], content: null });
+        } else {
+            await ctx.editReply({embeds: [embed], content: null});
+        }
     }
 });

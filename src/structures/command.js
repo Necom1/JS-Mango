@@ -4,28 +4,44 @@ const Discord = require('discord.js');
 
 /**
  *
- * @param {Discord.Message | Discord.Interaction} msg
- * @param {string[]} args
+ * @param {Discord.Message | Discord.Interaction} ctx
+ * @param {string[] | null} args
  * @param {Mango} bot
  * @constructor
  */
-function RunFunction(msg, args, bot) {}
+function RunFunction(bot, ctx, args) {}
 
 class Command {
     /**
-     * @typedef {{name: string, description: string, run: RunFunction, minArgs: Number, maxArgs: Number,
-     * permission: Discord.PermissionString, aliases: Array<String>}} CommandOptions
+     * @typedef {{name: string,
+     * description: string,
+     * options: Object[],
+     * permission: Discord.PermissionString,
+     * aliases: String[],
+     * minArgs: Number,
+     * maxArgs: Number,
+     * noDM: boolean,
+     * noSlash: boolean,
+     * private: boolean,
+     * run: RunFunction}} CommandOptions
      * @param {CommandOptions} options
      * @constructor
      */
     constructor(options) {
         this.name = options.name;
         this.description = options.description;
+        this.options = options.options;
         this.permission = options.permission;
         this.aliases = options.aliases;
         this.minArgs = options.minArgs;
         this.maxArgs = options.maxArgs;
+        this.noDM = options.noDM;
+        this.noSlash = options.noSlash;
+        this.private = options.private;
         this.run = options.run;
+        this.slashData = (!this.name || !this.description || this.noSlash) ? null : {
+            name: this.name, description: this.description, options: this.options
+        };
     }
 }
 
