@@ -17,6 +17,7 @@ module.exports = new Command({
     permission: 'SEND_MESSAGES',
     maxArgs: 1,
     private: true,
+    checks: true,
 
     async run(bot, ctx, args) {
         let target = '';

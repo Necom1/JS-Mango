@@ -13,7 +13,7 @@ function RunFunction(bot, ctx, args) {}
 
 class Command {
     /**
-     * @typedef {{name: string,
+     * @typedef {{ name: string,
      * description: string,
      * options: Object[],
      * permission: Discord.PermissionString,
@@ -23,7 +23,9 @@ class Command {
      * noDM: boolean,
      * noSlash: boolean,
      * private: boolean,
-     * run: RunFunction}} CommandOptions
+     * checks: boolean,
+     * admins: boolean,
+     * run: RunFunction }} CommandOptions
      * @param {CommandOptions} options
      * @constructor
      */
@@ -33,11 +35,15 @@ class Command {
         this.options = options.options;
         this.permission = options.permission;
         this.aliases = options.aliases;
+
         this.minArgs = options.minArgs;
         this.maxArgs = options.maxArgs;
+
         this.noDM = options.noDM;
         this.noSlash = options.noSlash;
         this.private = options.private;
+        this.checks = options.checks;
+        this.admins = options.admins;
         this.run = options.run;
         this.slashData = (!this.name || !this.description || this.noSlash) ? null : {
             name: this.name, description: this.description, options: this.options

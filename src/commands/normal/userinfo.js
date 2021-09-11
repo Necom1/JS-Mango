@@ -16,6 +16,7 @@ module.exports = new Command({
     aliases: ['uinfo'],
     permission: 'SEND_MESSAGES',
     maxArgs: 1,
+    checks: true,
 
     async run(bot, ctx, args) {
         const isMsg = ctx instanceof Message;

@@ -1,11 +1,12 @@
 const Command = require('../../structures/command.js');
-const {Message} = require("discord.js");
+const { Message } = require("discord.js");
 
 module.exports = new Command({
     name: 'utc',
     description: 'the current UTC / GMT time',
     aliases: ['gmt'],
     permission: 'SEND_MESSAGES',
+    checks: true,
 
     async run(bot, ctx, args) {
         const data = new Date().toUTCString();

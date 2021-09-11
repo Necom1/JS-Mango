@@ -7,6 +7,7 @@ module.exports = new Command({
     private: true,
     aliases: ['connection'],
     permission: 'SEND_MESSAGES',
+    checks: true,
 
     async run(bot, ctx, args) {
         const ping = bot.ws.ping;
@@ -35,7 +36,7 @@ module.exports = new Command({
         }
 
         if (isMsg) {
-            m.edit({ embeds: [embed], content: null });
+            await m.edit({embeds: [embed], content: null});
         } else {
             await ctx.editReply({embeds: [embed], content: null});
         }

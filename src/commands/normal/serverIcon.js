@@ -1,5 +1,5 @@
 const Command = require('../../structures/command.js');
-const { MessageEmbed, Message} = require('discord.js');
+const { MessageEmbed, Message } = require('discord.js');
 const getAvgC = require('fast-average-color-node');
 
 module.exports = new Command({
@@ -8,6 +8,7 @@ module.exports = new Command({
     aliases: ['spfp, server_icon'],
     permission: 'SEND_MESSAGES',
     noDM: true,
+    checks: true,
 
     async run(bot, ctx) {
         const embed = new MessageEmbed();
@@ -19,9 +20,9 @@ module.exports = new Command({
             .setImage(url);
 
         if (ctx instanceof Message) {
-            ctx.reply({ embeds: [embed] });
+            await ctx.reply({embeds: [embed]});
         } else {
-            ctx.followUp({ embeds: [embed] });
+            await ctx.followUp({embeds: [embed]});
         }
     }
 });
